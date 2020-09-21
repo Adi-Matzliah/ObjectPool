@@ -19,10 +19,10 @@ class ObjectPool(maxObjects: Int = 1) {
     }
 
     /**
-     * The internal method to retrieve a connection from the pool,
+     * The internal method to retrieve a object from the pool,
      * associating it with a weak reference. This is called from
-     * [.getConnection], which is responsible for ensuring
-     * that there's a connection in the pool
+     * [.getObject], which is responsible for ensuring
+     * that there's a object in the pool
      */
     @Synchronized
     private fun wrapObject(someObject: SomeObject): SomeObject {
@@ -65,7 +65,7 @@ class ObjectPool(maxObjects: Int = 1) {
     }
 
     /**
-     * Returns a connection to the pool when the associated reference is
+     * Returns a object to the pool when the associated reference is
      * enqueued.
      */
     @Synchronized
@@ -86,5 +86,4 @@ class ObjectPool(maxObjects: Int = 1) {
         _pool.offer(obj)
         System.err.println("Released object $obj")
     }
-
 }
