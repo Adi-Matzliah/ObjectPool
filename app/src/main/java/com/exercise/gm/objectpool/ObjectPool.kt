@@ -5,47 +5,35 @@ import java.lang.ref.Reference
 import java.lang.ref.ReferenceQueue
 import java.util.*
 
-class ObjectPool(maxObjects: Int = 1) {
-    private val _pool: Queue<SomeObject> = LinkedList<SomeObject>()
+open class ObjectPool(maxObjects: Int = 1) {
+    private val _pool: Queue<SomeObject> = LinkedList()
 
     private val _refQueue: ReferenceQueue<Any> = ReferenceQueue()
     private val _refToObj: IdentityHashMap<Any, SomeObject> = IdentityHashMap()
     private val _objToRef: IdentityHashMap<SomeObject, Any> = IdentityHashMap()
 
     init {
-        for (i in 1 until maxObjects) {
+        println("initializing the pool:")
+        for (i in 0 until maxObjects) {
             _pool.add(ObjectFactory.createObject(i, i.toString()))
+            println("object number $i was created ${_pool.size}")
         }
     }
 
     /**
      * The internal method to retrieve a object from the pool,
      * associating it with a weak reference. This is called from
-     * [.getObject], which is responsible for ensuring
+     * [.pull], which is responsible for ensuring
      * that there's a object in the pool
      */
     @Synchronized
     private fun wrapObject(someObject: SomeObject): SomeObject {
-        val ref: PhantomReference<SomeObject> = PhantomReference(someObject, _refQueue)
+        val wrapped = SomeObject(someObject.someInt, someObject.someString)
+        val ref: PhantomReference<SomeObject> = PhantomReference(wrapped, _refQueue)
         _objToRef[someObject] = ref
         _refToObj[ref] = someObject
-        return someObject
-    }
-
-
-    /**
-     * Retrieves a object from the pool, blocking until one becomes
-     * available.
-     */
-    fun pull(): SomeObject {
-        while (true) {
-            synchronized(this) {
-                if (_pool.size > 0) {
-                    return wrapObject(_pool.remove())
-                }
-            }
-            tryWaitingForGarbageCollector()
-        }
+        System.err.println("Acquired object $someObject")
+        return wrapped
     }
 
     /**
@@ -85,5 +73,21 @@ class ObjectPool(maxObjects: Int = 1) {
         _refToObj.remove(ref)
         _pool.offer(obj)
         System.err.println("Released object $obj")
+    }
+
+    /**
+     * Retrieves a object from the pool, blocking until one becomes
+     * available.
+     */
+    fun pull(): SomeObject {
+        //println("waiting for retrieving object from the pull...")
+        while (true) {
+            synchronized(this) {
+                if (_pool.size > 0) {
+                    return wrapObject(_pool.remove())
+                }
+            }
+            tryWaitingForGarbageCollector()
+        }
     }
 }

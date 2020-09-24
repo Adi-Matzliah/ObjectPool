@@ -1,5 +1,7 @@
 package com.exercise.gm.objectpool
 
+import com.exercise.gm.objectpool.connection.ConnectionPoolDemo
+import com.exercise.gm.objectpool.demo.ObjectPoolDemo
 import org.junit.Test
 
 import org.junit.Assert.*
@@ -11,7 +13,7 @@ import org.junit.Assert.*
  */
 class ExampleUnitTest {
     @Test
-    fun addition_isCorrect() {
-        assertEquals(4, 2 + 2)
+    fun objectPool_isRunning() {
+        ObjectPoolDemo.runDemo()
     }
 }
