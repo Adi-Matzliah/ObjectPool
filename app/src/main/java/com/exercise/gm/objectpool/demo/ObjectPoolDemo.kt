@@ -2,7 +2,7 @@ package com.exercise.gm.objectpool.demo
 
 import com.exercise.gm.objectpool.ObjectPool
 import com.exercise.gm.objectpool.SomeObject
-
+ 
 object ObjectPoolDemo {
 
 
